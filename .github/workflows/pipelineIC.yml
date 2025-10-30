@@ -19,11 +19,10 @@ jobs:
         
         - name: Check for critical/High/Medium Vulnerabilities
           run: |
-            RESPONSE=$(curl -s -X GET -u '${{secrets.SONAR_TOKEN}}:' \ 
-            'https://sonarcloud.io/api/issues/search?componentKeys=imssolar_devsecops-laboratorio&facets=severities')
+            RESPONSE=$(curl -s -X GET -u '${{secrets.SONAR_TOKEN}}:' 'https://sonarcloud.io/api/issues/search?componentKeys=imssolar_devsecops-laboratorio&facets=severities')
 
             echo "Complete Response:"
             echo "$RESPONSE" | jq '.'
-            
+
             issueValidate=$(echo "$RESPONSE" | jq '.facets[0].values[1].count')
             echo "Cantidad de issues: $issueValidate"
