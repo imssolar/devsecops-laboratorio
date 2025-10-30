@@ -23,8 +23,8 @@ jobs:
 
             TOTAL=$(echo "$RESPONSE | jq" '.total')
             if [ "$TOTAL" -gt 0 ]; then
-            echo "❌ Se encontraron $TOTAL vulnerabilidades bloqueantes. Pipeline falla."
+            echo "Se encontraron $TOTAL vulnerabilidades bloqueantes. Pipeline falla."
                 exit 1
             else
-                echo "✅ No se encontraron vulnerabilidades Critical/High/Medium."
+                echo "No se encontraron vulnerabilidades Critical/High/Medium."
             fi
