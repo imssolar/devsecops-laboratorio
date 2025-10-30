@@ -17,25 +17,15 @@ jobs:
             GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
             SONAR_TOKEN: ${{secrets.SONAR_TOKEN}}
         
-            -name: Debug API Response
-            run: |
-                curl -s -u '${{secrets.SONAR_TOKEN}}:' \
-                    'https://sonarcloud.io/api/issues/search?componentKeys=imssolar_devsecops-laboratorio&resolved=false&severities=MAJOR&ps=1' \
-                    | jq '{total: .total, paging: .paging}'
-        
-        - name: Check for critical/High/Medium Vulnerabilities
+        - name: Check for Critical/High/Medium Vulnerabilities
           run: |
-            RESPONSE=$(curl -s -X GET -u '${{secrets.SONAR_TOKEN}}:' 'https://sonarcloud.io/api/issues/search?componentKeys=imssolar_devsecops-laboratorio&severities=BLOCKER,CRITICAL,MAJOR&statuses=OPEN')
-
-            TOTAL=$(echo "$RESPONSE | jq" '.total')
-            echo "Total de issues (vulnerabilities + bug): $TOTAL"
-
-             MAJOR_RESPONSE=$(curl -s -u '${{secrets.SONAR_TOKEN}}:' \
-                'https://sonarcloud.io/api/issues/search?componentKeys=imssolar_devsecops-laboratorio&resolved=false&severities=BLOCKER,CRITICAL,MAJOR&ps=1')
-            
-            if [ "$TOTAL" -gt 0 ]; then
-            echo "Se encontraron $TOTAL vulnerabilidades bloqueantes. Pipeline falla."
+           RESPONSE=$(curl -s -u '${{secrets.SONAR_TOKEN}}:' 'https://sonarcloud.io/api/issues/search?componentKeys=imssolar_devsecops-laboratorio&resolved=false&types=VULNERABILITY,BUG&ps=1')
+           TOTAL=$(echo "$RESPONSE" | jq '.total')
+           echo "Total issues (Vulnerability + Bugs): $TOTAL"
+           if [ ! -z "$TOTAL" ] && [ "$TOTAL" != "null" ] && [ "$TOTAL" -gt 0 ]; then
+                echo "❌ Se encontraron $TOTAL vulnerabilidades. Pipeline falla."
                 exit 1
             else
-                echo "No se encontraron vulnerabilidades Critical/High/Medium."
+                echo "✅ No se encontraron vulnerabilidades."
             fi
+        
