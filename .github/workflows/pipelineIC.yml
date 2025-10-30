@@ -22,6 +22,11 @@ jobs:
             RESPONSE=$(curl -s -X GET -u '${{secrets.SONAR_TOKEN}}:' 'https://sonarcloud.io/api/issues/search?componentKeys=imssolar_devsecops-laboratorio&severities=BLOCKER,CRITICAL,MAJOR&statuses=OPEN')
 
             TOTAL=$(echo "$RESPONSE | jq" '.total')
+            echo "Total de issues (vulnerabilities + bug): $TOTAL"
+
+             MAJOR_RESPONSE=$(curl -s -u '${{secrets.SONAR_TOKEN}}:' \
+                'https://sonarcloud.io/api/issues/search?componentKeys=imssolar_devsecops-laboratorio&resolved=false&severities=BLOCKER,CRITICAL,MAJOR&ps=1')
+            
             if [ "$TOTAL" -gt 0 ]; then
             echo "Se encontraron $TOTAL vulnerabilidades bloqueantes. Pipeline falla."
                 exit 1
