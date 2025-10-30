@@ -19,10 +19,12 @@ jobs:
         
         - name: Check for critical/High/Medium Vulnerabilities
           run: |
-            RESPONSE=$(curl -s -X GET -u '${{secrets.SONAR_TOKEN}}:' 'https://sonarcloud.io/api/issues/search?componentKeys=imssolar_devsecops-laboratorio&facets=severities')
+            RESPONSE=$(curl -s -X GET -u '${{secrets.SONAR_TOKEN}}:' 'https://sonarcloud.io/api/issues/search?componentKeys=imssolar_devsecops-laboratorio&severities=BLOCKER,CRITICAL,MAJOR&statuses=OPEN')
 
-            echo "Complete Response:"
-            echo "$RESPONSE" | jq '.'
-
-            issueValidate=$(echo "$RESPONSE" | jq '.facets[0].values[1].count')
-            echo "Cantidad de issues: $issueValidate"
+            TOTAL=$(echo "$RESPONSE | jq" '.total')
+            if [ "$TOTAL" -gt 0 ]; then
+            echo "❌ Se encontraron $TOTAL vulnerabilidades bloqueantes. Pipeline falla."
+                exit 1
+            else
+                echo "✅ No se encontraron vulnerabilidades Critical/High/Medium."
+            fi
