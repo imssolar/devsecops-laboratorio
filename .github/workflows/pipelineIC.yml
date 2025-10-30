@@ -23,9 +23,9 @@ jobs:
            TOTAL=$(echo "$RESPONSE" | jq '.total')
            echo "Total issues (Vulnerability + Bugs): $TOTAL"
            if [ ! -z "$TOTAL" ] && [ "$TOTAL" != "null" ] && [ "$TOTAL" -gt 0 ]; then
-                echo "❌ Se encontraron $TOTAL vulnerabilidades. Pipeline falla."
+                echo "Se encontraron $TOTAL vulnerabilidades. Pipeline falla."
                 exit 1
             else
-                echo "✅ No se encontraron vulnerabilidades."
+                echo " No se encontraron vulnerabilidades."
             fi
         
