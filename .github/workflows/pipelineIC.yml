@@ -1,52 +1,57 @@
 name: Workflow
 on:
-    push:
-        branches:
-            - main
-            - feature/devsecops
+  push:
+    branches:
+      - main
+      - feature/devsecops
 
 jobs:
-    SAST:
-      runs-on: ubuntu-latest
-      steps:
-        - name: checkout code
-          uses: actions/checkout@v4
+  SAST:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v4
 
-        - name: SonarCloud Scan
-          uses: SonarSource/sonarcloud-github-action@master
-          env:
-            GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
-            SONAR_TOKEN: ${{secrets.SONAR_TOKEN}}
-        
-        - name: Check for Critical/High/Medium Vulnerabilities
-          run: |
-           RESPONSE=$(curl -s -u '${{secrets.SONAR_TOKEN}}:' 'https://sonarcloud.io/api/issues/search?componentKeys=imssolar_devsecops-laboratorio&resolved=false&types=VULNERABILITY,BUG&ps=1')
-           TOTAL=$(echo "$RESPONSE" | jq '.total')
-           echo "Total issues (Vulnerability + Bugs): $TOTAL"
-           if [ ! -z "$TOTAL" ] && [ "$TOTAL" != "null" ] && [ "$TOTAL" -gt 0 ]; then
-                echo "Se encontraron $TOTAL vulnerabilidades. Pipeline falla."
-                exit 1
-            else
-                echo " No se encontraron vulnerabilidades."
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          SONAR_TOKEN: ${{secrets.SONAR_TOKEN}}
+
+      - name: Check for Critical/High/Medium Vulnerabilities with Sonar
+        run: |
+          RESPONSE=$(curl -s -u '${{secrets.SONAR_TOKEN}}:' 'https://sonarcloud.io/api/issues/search?componentKeys=imssolar_devsecops-laboratorio&resolved=false&types=VULNERABILITY,BUG&ps=1')
+          TOTAL=$(echo "$RESPONSE" | jq '.total')
+          echo "Total issues (Vulnerability + Bugs): $TOTAL"
+          if [ ! -z "$TOTAL" ] && [ "$TOTAL" != "null" ] && [ "$TOTAL" -gt 0 ]; then
+               echo "Se encontraron $TOTAL vulnerabilidades. Pipeline falla."
+               exit 1
+           else
+               echo " No se encontraron vulnerabilidades."
+           fi
+  SCA:
+    runs-on: ubuntu-latest
+    needs: SAST
+    if: always()
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Run OWASP Dependency-check
+        uses: dependency-check/Dependency-Check_Action@main
+        with:
+          project: "devsecops-laboratorio"
+          path: "."
+          format: "HTML"
+
+      - name: Check for Critical/High/Medium Vulnerabilities in Dependencies
+        run: |
+          if [ -f "reports/dependency-check-report.json" ]; then
+              CRITICAL=$(jq '[.dependencies[].vulnerabilities[] | select(.severity == "CRITICAL")] | length' reports/dependency-check-report.json)
+              TOTAL_CRITICAL=$((CRITICAL))
+            if[ "$TOTAL_CRITICAL" -gt 0 ]; then
+              echo "Se encontraron vulnerabilidades criticas"
+              exit 1
             fi
-    SCA:
-        runs-on: ubuntu-latest
-        needs: SAST
-        if: always()
-        steps:
-          - name: Checkout code
-            uses: actions/checkout@v4
-          - name: Run OWASP Dependency-check
-            uses: dependency-check/Dependency-Check_Action@main
-            with:
-              project: 'devsecops-laboratorio'
-              path: '.'
-              format: 'HTML'
-
-          - name: Check for Critical/High/Medium Vulnerabilities in Dependencies
-            run: |
-                if [ -f "reports/dependency-check-report.json" ]; then
-                echo "Está disponible el resporte JSON"
-                fi
-          
-        
+            else
+              echo "Al parecer no hay vulnerabilidades"
+          fi
