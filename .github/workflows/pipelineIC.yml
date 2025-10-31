@@ -47,5 +47,6 @@ jobs:
             run: |
                 if [ -f "reports/dependency-check-report.json" ]; then
                 echo "Está disponible el resporte JSON"
+                fi
           
         
