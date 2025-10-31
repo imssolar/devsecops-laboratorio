@@ -46,12 +46,16 @@ jobs:
       - name: Check for Critical/High/Medium Vulnerabilities in Dependencies
         run: |
           if [ -f "reports/dependency-check-report.json" ]; then
-              CRITICAL=$(jq '[.dependencies[].vulnerabilities[] | select(.severity == "CRITICAL")] | length' reports/dependency-check-report.json)
-              TOTAL_CRITICAL=$((CRITICAL))
-            if[ "$TOTAL_CRITICAL" -gt 0 ]; then
-              echo "Se encontraron vulnerabilidades criticas"
+            CRITICAL=$(jq '[.dependencies[].vulnerabilities[] | select(.severity == "CRITICAL")] | length' reports/dependency-check-report.json)
+            TOTAL_CRITICAL=$((CRITICAL))
+
+            if [ "$TOTAL_CRITICAL" -g 0 ]; then
+              echo "Se encontraron $TOTAL_CRITICAL vulnerabilidades criticas"
               exit 1
+            else 
+              echo "No se encontraron vulnerabilidades criticas"
             fi
-            else
-              echo "Al parecer no hay vulnerabilidades"
+          else
+            echo "Al parecer no hay vulnerabilidades"
           fi
+             
