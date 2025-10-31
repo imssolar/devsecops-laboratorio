@@ -47,13 +47,15 @@ jobs:
         run: |
           if [ -f "reports/dependency-check-report.json" ]; then
             CRITICAL=$(jq '[.dependencies[].vulnerabilities[] | select(.severity == "CRITICAL")] | length' reports/dependency-check-report.json)
+            HIGH=$(jq '[.dependencies[].vulnerabilities[] | select(.severity == "HIGH")] | length' reports/dependency-check-report.json)
             TOTAL_CRITICAL=$((CRITICAL))
+            TOTAL_HIGH=$((HIGH))
 
-            if [ "$TOTAL_CRITICAL" -g 0 ]; then
-              echo "Se encontraron $TOTAL_CRITICAL vulnerabilidades criticas"
+            if [ "$TOTAL_HIGH" -g 0 ]; then
+              echo "Se encontraron $TOTAL_HIGH vulnerabilidades altas"
               exit 1
             else 
-              echo "No se encontraron vulnerabilidades criticas"
+              echo "No se encontraron vulnerabilidades altas"
             fi
           else
             echo "Al parecer no hay vulnerabilidades"
