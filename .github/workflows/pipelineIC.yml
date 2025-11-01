@@ -76,8 +76,12 @@ jobs:
 
       - name: Generate Text Report
         run: |
-          npm audit > npm-audit-report.txt || true
-        continue-on-error: true
+          set +e  # No detenerse en errores
+          npm audit > npm-audit-report.txt 2>&1
+          EXIT_CODE=$?
+          echo "Exit code: $EXIT_CODE"
+          ls -la npm-audit-report.txt
+          exit 0  # Siempre retornar éxito
 
       - name: Upload Text Report
         uses: actions/upload-artifact@v4
