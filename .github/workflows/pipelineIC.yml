@@ -76,7 +76,7 @@ jobs:
 
       - name: Generate Text Report
         run: |
-          npm audit > npm-audit-report.txt
+          npm audit > npm-audit-report.txt || true
         continue-on-error: true
 
       - name: Upload Text Report
