@@ -51,17 +51,19 @@ jobs:
         run: |
           CRITICAL=$(jq '.vulnerabilities | to_entries | map(select(.value.severity == "critical")) | length' npm-audit.json)
           HIGH=$(jq '.vulnerabilities | to_entries | map(select(.value.severity == "high")) | length' npm-audit.json)
+          MEDIUM=$(jq '.vulnerabilities | to_entries | map(select(.value.severity == "medium")) | length' npm-audit.json)
 
           echo "Vulnerabilidades encontradas:"
           echo "Critical: $CRITICAL"
           echo "High: $HIGH"
+          echo "Medium: $MEDIUM"
 
-          TOTAL=$((CRITICAL + HIGH))
+          TOTAL=$((CRITICAL + HIGH + MEDIUM))
           if [ "$TOTAL" -gt 0 ]; then
-            echo "Se encontraron vulnerabilidades altas/críticas"
+            echo "Se encontraron vulnerabilidades altas/críticas/medidas"
             exit 1
           else
-            echo "No se encontraron vulnerabilidades altas/críticas"
+            echo "No se encontraron vulnerabilidades altas/críticas/medias"
           fi
 
       - name: Upload audit Report
