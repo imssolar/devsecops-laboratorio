@@ -127,14 +127,17 @@ jobs:
           CRITICAL=$(jq '[.Results[].Vulnerabilities[]? | select(.Severity == "CRITICAL")] | length' trivy-report.json)
           MEDIUM=$(jq '[.Results[].Vulnerabilities[]? | select(.Severity == "MEDIUM")] | length' trivy-report.json)
           HIGH=$(jq '[.Results[].Vulnerabilities[]? | select(.Severity == "HIGH")] | length' trivy-report.json)
-          echo "Vulnerabilidades Criticas encontradas"
+          echo "Vulnerabilidades encontradas:"
+          echo "Críticas: $CRITICAL"
+          echo "Medias: $MEDIUM"
+          echo "Altas: $HIGH"
 
           TOTAL=$((CRITICAL + HIGH + MEDIUM))
 
           echo "Total: $TOTAL"
 
           if [ "$TOTAL" -gt 0 ]; then
-            echo "Se encontraron vulnerabilidades (por ahora sólo críticas) en la imagen docker"
+            echo "Se encontraron vulnerabilidades en la imagen docker"
             exit 1
           else
             echo "No se encontraron vulnerabilidades en la imagen Docker"
