@@ -74,18 +74,17 @@ jobs:
           name: npm-audit-report
           path: npm-audit.json
 
-      - name: Generate HTML Report
+      - name: Generate Text Report
         run: |
-          npm install -g npm-audit-html
-          npm audit --json | npm-audit-html --output npm-audit-report.html
+          npm audit > npm-audit-report.txt
         continue-on-error: true
 
-      - name: Upload HTML Report
+      - name: Upload Text Report
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: npm-audit-html-report
-          path: npm-audit-report.html
+          name: npm-audit-text-report
+          path: npm-audit-report.txt
 
 
              
