@@ -98,19 +98,14 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Build Docker Image
         run: |
-          echo "Archivos en el directorio actual:"
-          ls -la
-          echo "Buscando Dockerfile..."
-          if [ -f "Dockerfile"]; then
-            echo "Dockerfile encontrado!"
-          else 
-            echo "Dockerfile no encontrado"
-          fi
-          find . -name "Dockerfile" -o -name "dockerfile"
-          docker build -f Dockerfile -t devsecops-laboratorio:latest
+          echo "📂 Verificando Dockerfile..."
+          ls -lh Dockerfile
+          echo ""
+          echo "🏗️ Construyendo imagen..."
+          docker build -t devsecops-laboratorio:latest .
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
