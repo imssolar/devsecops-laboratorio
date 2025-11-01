@@ -37,13 +37,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       - name: Debug JSON Content
-        run:
-          echo "Contenido del JSON:"
-          cat reports/dependency-check-report.json | head -50
+        run: |
+          echo "📂 Archivos en reports/:"
+          ls -la reports/ || echo "La carpeta reports/ no existe"
           echo ""
-          echo "Estructura del JSON:"
-          jq '.' reports/dependency-check-report.json | head -20
-          
+          echo "📄 Contenido del JSON:"
+          cat reports/dependency-check-report.json || echo "No se pudo leer el archivo"
+          echo ""
+          echo "📊 Primeras líneas con jq:"
+          jq '.' reports/dependency-check-report.json | head -20 || echo "Error al parsear JSON"
+
       - name: Run OWASP Dependency-check
         uses: dependency-check/Dependency-Check_Action@main
         with:
