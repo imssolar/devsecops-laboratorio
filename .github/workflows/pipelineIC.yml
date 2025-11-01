@@ -50,5 +50,27 @@ jobs:
           npm audit --json > npm-audit.json || true
           cat npm-audit.json
 
+      - name: Check for Critical/High Vulnerabilities
+        run: |
+          CRITICAL=$(jq '.vulnerabilities | to_entries | map(select(.value.severity == "critical")) | length' npm-audit.json)
+          HIGH=$(jq '.vulnerabilities | to_entries | map(select(.value.severity == "high")) | length' npm-audit.json)
+
+          echo "Vulnerabilidades encontradas:"
+          echo "Critical: $CRITICAL"
+          echo "High: $HIGH"
+
+          if [ "$CRITICAL -gt 0 "] || [ "$HIGH" -gt 0 ]; then
+            echo "Se encontraron vulnerabilidades críticas/altas"
+            exit 1
+          else
+            echo "No se encontraron vulnerabilidades críticas/altas"
+          fi
+      - name: Upload audit Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: npm-audit-report
+          path: npm-audit.json
+
 
              
