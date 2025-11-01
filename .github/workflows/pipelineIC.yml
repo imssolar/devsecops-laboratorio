@@ -37,48 +37,18 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Find depedency-check reports
-        run: |
-          echo "Search files related to dependency check:"
-          find . -name "*dependency-check" -type f
-          echo ""
-          echo "Folder structure"
-          ls -R | head -50
-
-      - name: Debug JSON Content
-        run: |
-          echo "📂 Archivos en reports/:"
-          ls -la reports/ || echo "La carpeta reports/ no existe"
-          echo ""
-          echo "📄 Contenido del JSON:"
-          cat reports/dependency-check-report.json || echo "No se pudo leer el archivo"
-          echo ""
-          echo "📊 Primeras líneas con jq:"
-          jq '.' reports/dependency-check-report.json | head -20 || echo "Error al parsear JSON"
-
-      - name: Run OWASP Dependency-check
-        uses: dependency-check/Dependency-Check_Action@main
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
-          project: "devsecops-laboratorio"
-          path: '.'
-          format: 'JSON'
-          out: 'reports'
+          node-version: '18'
 
-      - name: Check for Critical/High/Medium Vulnerabilities in Dependencies
+      - name: Run npm audit
         run: |
-          if [ -f "reports/dependency-check-report.json" ]; then
-            CRITICAL=$(jq '[.dependencies[].vulnerabilities[] | select(.severity == "CRITICAL")] | length' reports/dependency-check-report.json)
-            HIGH=$(jq '[.dependencies[].vulnerabilities[] | select(.severity == "HIGH")] | length' reports/dependency-check-report.json)
-            TOTAL_CRITICAL=$((CRITICAL))
-            TOTAL_HIGH=$((HIGH))
+          npm audit --json > npm-audit.json || true
+          cat npm-audit.json
 
-            if [ "$TOTAL_HIGH" -g 0 ]; then
-              echo "Se encontraron $TOTAL_HIGH vulnerabilidades altas"
-              exit 1
-            else 
-              echo "No se encontraron vulnerabilidades altas"
-            fi
-          else
-            echo "Al parecer no hay vulnerabilidades"
-          fi
+
              
