@@ -75,6 +75,7 @@ jobs:
           path: npm-audit.json
 
       - name: Generate Text Report
+        if: always()
         run: |
           set +e  # No detenerse en errores
           npm audit > npm-audit-report.txt 2>&1
