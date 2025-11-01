@@ -90,6 +90,48 @@ jobs:
         with:
           name: npm-audit-text-report
           path: npm-audit-report.txt
+  
+  Image-Security:
+    runs-on: ubuntu-latest
+    needs: SCA
+    if: always()
+    steps:
+      - name: Build Docker Image
+        run: |
+          docker build -t devsecops-laboratorio:latest .
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'devsecops-laboratorio:latest'
+          format: 'json'
+          output: 'trivy-report.json'
+          severity: 'CRITICAL,HIGH,MEDIUM'
+          
+      - name: Upload Trivy Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: trivy-report
+          path: trivy-report.json
+
+      - name: Check for Critical/High/Medium Vulnerabilities
+        run: |
+          CRITICAL=$(jq '[.Results[].Vulnerabilities[]? | select(.Severity == "CRITICAL")] | length' trivy-report.json)
+
+          echo "Vulnerabilidades Criticas encontradas"
+
+          TOTAL=$((CRITICAL))
+
+          echo "Total Críticas: $CRITICAL"
+
+          if [ "$TOTAL" -gt 0]; then
+            echo "Se encontraron vulnerabilidades (por ahora sólo críticas) en la imagen docker"
+            exit 1
+          else
+            echo "No se encontraron vulnerabilidades en la imagen Docker"
+          fi
+        
 
 
              
