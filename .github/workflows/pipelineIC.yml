@@ -76,7 +76,8 @@ jobs:
 
       - name: Generate HTML Report
         run: |
-          npm audit --json | npx npm-audit-html --output npm-audit-report.html
+          npm install -g npm-audit-html
+          npm audit --json | npm-audit-html --output npm-audit-report.html
         continue-on-error: true
 
       - name: Upload HTML Report
