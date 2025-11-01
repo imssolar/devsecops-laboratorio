@@ -41,7 +41,7 @@ jobs:
         with:
           project: "devsecops-laboratorio"
           path: "."
-          format: "HTML"
+          format: "JSON"
 
       - name: Check for Critical/High/Medium Vulnerabilities in Dependencies
         run: |
