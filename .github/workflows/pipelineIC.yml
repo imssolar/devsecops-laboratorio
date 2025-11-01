@@ -96,6 +96,9 @@ jobs:
     needs: SCA
     if: always()
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
       - name: Build Docker Image
         run: |
           echo "Archivos en el directorio actual:"
