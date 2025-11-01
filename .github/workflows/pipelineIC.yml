@@ -59,6 +59,7 @@ jobs:
           echo "Medium: $MEDIUM"
 
           TOTAL=$((CRITICAL + HIGH + MEDIUM))
+          echo "TOTAL Vulnerabilidades: $TOTAL"
           if [ "$TOTAL" -gt 0 ]; then
             echo "Se encontraron vulnerabilidades altas/críticas/medidas"
             exit 1
