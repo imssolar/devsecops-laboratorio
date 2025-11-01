@@ -36,6 +36,15 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Find depedency-check reports
+        run: |
+          echo "Search files related to dependency check:"
+          find . -name "*dependency-check" -type f
+          echo ""
+          echo "Folder structure"
+          ls -R | head -50
+
       - name: Debug JSON Content
         run: |
           echo "📂 Archivos en reports/:"
@@ -51,8 +60,9 @@ jobs:
         uses: dependency-check/Dependency-Check_Action@main
         with:
           project: "devsecops-laboratorio"
-          path: "."
-          format: "JSON"
+          path: '.'
+          format: 'JSON'
+          out: 'reports'
 
       - name: Check for Critical/High/Medium Vulnerabilities in Dependencies
         run: |
