@@ -36,6 +36,14 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+      - name: Debug JSON Content
+        run:
+          echo "Contenido del JSON:"
+          cat reports/dependency-check-report.json | head -50
+          echo ""
+          echo "Estructura del JSON:"
+          jq '.' reports/dependency-check-report.json | head -20
+          
       - name: Run OWASP Dependency-check
         uses: dependency-check/Dependency-Check_Action@main
         with:
