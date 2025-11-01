@@ -59,12 +59,14 @@ jobs:
           echo "Critical: $CRITICAL"
           echo "High: $HIGH"
 
-          if [ "$CRITICAL -gt 0 "] || [ "$HIGH" -gt 0 ]; then
-            echo "Se encontraron vulnerabilidades críticas/altas"
+          TOTAL=$((CRITICAL + HIGH))
+          if [ "$TOTAL" -gt 0 ]; then
+            echo "Se encontraron vulnerabilidades altas/críticas"
             exit 1
           else
-            echo "No se encontraron vulnerabilidades críticas/altas"
+            echo "No se encontraron vulnerabilidades altas/críticas"
           fi
+
       - name: Upload audit Report
         uses: actions/upload-artifact@v4
         if: always()
